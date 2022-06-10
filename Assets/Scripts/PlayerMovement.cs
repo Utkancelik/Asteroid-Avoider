@@ -10,6 +10,9 @@ public class PlayerMovement : MonoBehaviour
     */
     [SerializeField] private float forceMagnitude;
     [SerializeField] private float maxForceMagnitude;
+    [SerializeField] private float minXPosition, maxXposition;
+    [SerializeField] private float minYPosition, maxYposition;
+
 
 
 
@@ -22,7 +25,24 @@ public class PlayerMovement : MonoBehaviour
         mainCam = Camera.main;
     }
     private void Update()
-    {   
+    {
+        DetermineMovementDirection();
+        KeepPlayerOnScreen();
+
+    }
+    private void FixedUpdate()
+    {
+        // if we dont press anything return
+        if (moveDir == Vector3.zero) { return; }
+
+        // otherwise means that we have a direction so we apply force
+        rb.AddForce(moveDir * forceMagnitude, ForceMode.Force);
+        // restrict the velocity of the rigidbody
+        rb.velocity =  Vector3.ClampMagnitude(rb.velocity,maxForceMagnitude);
+    }
+
+    private void DetermineMovementDirection()
+    {
         // check if I pressed on screen
         if (Touchscreen.current.primaryTouch.press.isPressed)
         {
@@ -44,16 +64,44 @@ public class PlayerMovement : MonoBehaviour
             moveDir = Vector3.zero;
         }
     }
-    private void FixedUpdate()
+
+
+    // This function makes our game to be sure about our player doesnt go off screen.
+    private void KeepPlayerOnScreen()
     {
-        // if we dont press anything return
-        if (moveDir == Vector3.zero) { return; }
+        // since we cannot change the transform.position directly we are copy it to the newPos variable.
+        Vector3 newPos = transform.position;
+        // we are checking if the player go off screen by VIEWPORT
+        // because we want this code to work in all devices so we cannot measure the manually.
+        // VIEWPORT helps us to determine all devices' screen size (x and y)
+        Vector3 viewportPos = mainCam.WorldToViewportPoint(transform.position);
 
-        // otherwise means that we have a direction so we apply force
-        rb.AddForce(moveDir * forceMagnitude, ForceMode.Force);
-        // restrict the velocity of the rigidbody
-        rb.velocity =  Vector3.ClampMagnitude(rb.velocity,maxForceMagnitude);
+        // if we went off to the right of the screen
+        if (viewportPos.x > 1)
+        {
+            // then teleport the plyer the left side which means multiplied by (-) 
+            newPos.x = -newPos.x + 0.1f;
+        }
+        // if we went off to the left of the screen
+        else if (viewportPos.x < 0)
+        {
+            // then teleport the plyer the right side which means multiplied by (-) 
+            newPos.x = -newPos.x - 0.1f;
+        }
+        // if we went off to the up of the screen
+        if (viewportPos.y > 1)
+        {
+            // then teleport the plyer the down side which means multiplied by (-) 
+            newPos.y = -newPos.y + 0.1f;
+        }
+        // if we went off to the down of the screen
+        else if (viewportPos.y < 0)
+        {
+            // then teleport the plyer the up side which means multiplied by (-)
+            newPos.y = -newPos.y - 0.1f; //the 0.1f part is because we want to make a little bit tp effect actually.
+        }
+        // after all conditions now we can assign manipulated position newPos to us position
+        transform.position = newPos;
     }
-
 
 }

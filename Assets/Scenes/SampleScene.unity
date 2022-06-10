@@ -278,8 +278,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 200036ed32a64fe46b6bdffb06726b42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forceMagnitude: 75
-  maxForceMagnitude: 5
+  forceMagnitude: 200
+  maxForceMagnitude: 6
+  minXPosition: -8
+  maxXposition: 8
+  minYPosition: -3.5
+  maxYposition: 3.5
 --- !u!54 &1250719471
 Rigidbody:
   m_ObjectHideFlags: 0
