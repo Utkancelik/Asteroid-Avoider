@@ -10,8 +10,8 @@ public class PlayerMovement : MonoBehaviour
     */
     [SerializeField] private float forceMagnitude;
     [SerializeField] private float maxForceMagnitude;
-    [SerializeField] private float minXPosition, maxXposition;
-    [SerializeField] private float minYPosition, maxYposition;
+    [SerializeField] private float rotationSpeed;
+
 
 
 
@@ -27,8 +27,10 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         DetermineMovementDirection();
+
         KeepPlayerOnScreen();
 
+        RotateTowardsVelocityDirection();
     }
     private void FixedUpdate()
     {
@@ -41,6 +43,7 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity =  Vector3.ClampMagnitude(rb.velocity,maxForceMagnitude);
     }
 
+    #region Handles the determining the movement direction
     private void DetermineMovementDirection()
     {
         // check if I pressed on screen
@@ -64,9 +67,10 @@ public class PlayerMovement : MonoBehaviour
             moveDir = Vector3.zero;
         }
     }
+    #endregion
 
 
-    // This function makes our game to be sure about our player doesnt go off screen.
+    #region This function makes our game to be sure about our player doesnt go off screen.
     private void KeepPlayerOnScreen()
     {
         // since we cannot change the transform.position directly we are copy it to the newPos variable.
@@ -103,5 +107,18 @@ public class PlayerMovement : MonoBehaviour
         // after all conditions now we can assign manipulated position newPos to us position
         transform.position = newPos;
     }
+    #endregion
+
+
+    #region Handles the rotation of the ship 
+    private void RotateTowardsVelocityDirection()
+    {
+        if(rb.velocity == Vector3.zero) { return; }
+
+        Quaternion targetRotation = Quaternion.LookRotation(rb.velocity, Vector3.back);
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+    }
+    #endregion
+
 
 }
