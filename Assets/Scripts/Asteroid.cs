@@ -13,4 +13,9 @@ public class Asteroid : MonoBehaviour
         // if it has it means that it is a player ship then call the function CRASH
         playerHealth.Crash();
     }
+
+    private void OnBecameInvisible()
+    {
+        Destroy(gameObject);
+    }
 }
